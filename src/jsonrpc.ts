@@ -145,13 +145,6 @@ export class JsonRpcError extends JsonRpcResponse {
  * as member in the JSON-RPC response error
  */
 export class ErrorObject extends Serializer {
-  /** A Number that indicates the error type that occurred. This MUST be an integer. */
-  public code: number;
-  /** A String providing a short description of the error. */
-  public message: string;
-  /** A Primitive or Structured value that contains additional information about the error. This may be omitted. */
-  public data?: any;
-
   static parseError(data?: any): ErrorObject {
     return new ErrorObject(-32700, 'Parse error', data);
   }
@@ -171,6 +164,13 @@ export class ErrorObject extends Serializer {
   static internalError(data?: any): ErrorObject {
     return new ErrorObject(-32603, 'Internal error', data);
   }
+
+  /** A Number that indicates the error type that occurred. This MUST be an integer. */
+  public code: number;
+  /** A String providing a short description of the error. */
+  public message: string;
+  /** A Primitive or Structured value that contains additional information about the error. This may be omitted. */
+  public data?: any;
 
   constructor(code: number, message: string, data?: any) {
     super();
@@ -233,13 +233,13 @@ function checkParams(params: any) {
   if (params !== undefined) {
     if (isObject(params) || Array.isArray(params)) {
       try {
-        JSON.stringify(params)
+        JSON.stringify(params);
+      } catch (e) {
+        throw ErrorObject.parseError(params);
       }
-      catch(e) {
-        throw ErrorObject.parseError(params)
-      }
+    } else {
+      throw ErrorObject.invalidParams(params);
     }
-    else throw ErrorObject.invalidParams(params)
   }
 }
 
@@ -251,6 +251,6 @@ function checkParams(params: any) {
  */
 function checkError(error: any) {
   if (!(error instanceof ErrorObject)) {
-    throw ErrorObject.internalError('Error MUST be an instance of ErrorObject!')
+    throw ErrorObject.internalError('Error MUST be an instance of ErrorObject!');
   }
 }
