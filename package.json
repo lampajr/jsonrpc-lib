@@ -1,0 +1,40 @@
+{
+  "name": "jsonrpc-lib",
+  "version": "0.1.0",
+  "description": "JSON-RPC 2.0 parser and serializer nodejs module",
+  "main": "jsonrpc.ts",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "build": "npm run format && npm run lint && tsc",
+    "test": "jest --watch",
+    "coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lampajr/jsonrpc-lib.git"
+  },
+  "keywords": [
+    "JSON-RPC",
+    "2.0",
+    "Parser",
+    "Serializer",
+    "Typescript"
+  ],
+  "author": "Andrea Lamparelli",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/lampajr/jsonrpc-lib/issues"
+  },
+  "homepage": "https://github.com/lampajr/jsonrpc-lib#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.23",
+    "jest": "^24.9.0",
+    "prettier": "^1.19.1",
+    "rimraf": "^3.0.0",
+    "tslint": "^5.20.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.7.2"
+  }
+}
