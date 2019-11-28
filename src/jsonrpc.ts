@@ -152,6 +152,26 @@ export class ErrorObject extends Serializer {
   /** A Primitive or Structured value that contains additional information about the error. This may be omitted. */
   public data?: any;
 
+  static parseError(data?: any): ErrorObject {
+    return new ErrorObject(-32700, 'Parse error', data);
+  }
+
+  static invalidRequest(data?: any): ErrorObject {
+    return new ErrorObject(-32600, 'Invalid request', data);
+  }
+
+  static methodNotFound(data?: any): ErrorObject {
+    return new ErrorObject(-32601, 'Method not found', data);
+  }
+
+  static invalidParams(data?: any): ErrorObject {
+    return new ErrorObject(-32602, 'Invalid params', data);
+  }
+
+  static internalError(data?: any): ErrorObject {
+    return new ErrorObject(-32603, 'Internal error', data);
+  }
+
   constructor(code: number, message: string, data?: any) {
     super();
     this.code = code;
@@ -164,7 +184,73 @@ export class ErrorObject extends Serializer {
 /** Checks whether a value is an integer or not */
 const isInteger = Number.isInteger;
 
+/** Check whether the value is a number or not */
+function isNumber(val: any) {
+  return typeof val === 'number';
+}
+
 /** Check whether the value is a string or not */
 function isString(val: any) {
   return typeof val === 'string';
+}
+
+/** Check whether the value is an object or not */
+function isObject(val: any) {
+  return typeof val === 'object';
+}
+
+/**
+ * Checks whether the JSON-RPC identifier is a valid one,
+ * hence compatible with the JSON-RPC 2.0 specification
+ * @param id identifier to check
+ * @throws [[ErrorObject]] if invalid
+ */
+function checkId(id: any): void {
+  if ((!isString(id) && !isNumber(id)) || (!isString(id) && !isInteger(id as number))) {
+    throw ErrorObject.parseError('The identifier MUST be a string or an integer!');
+  }
+}
+
+/**
+ * Checks whether the JSON-RPC method is a valid one,
+ * hence compatible with the JSON-RPC 2.0 specification
+ * @param method string method to check
+ * @throws [[ErrorObject]] if invalid
+ */
+function checkMethod(method: any) {
+  if (!isString(method)) {
+    throw ErrorObject.parseError('The method MUST be a string');
+  }
+}
+
+/**
+ * Checks whether the JSON-RPC params is a valid one,
+ * hence compatible with the JSON-RPC 2.0 specification
+ * @param params object to check
+ * @throws [[ErrorObject]] if invalid
+ */
+function checkParams(params: any) {
+  if (params !== undefined) {
+    if (isObject(params) || Array.isArray(params)) {
+      try {
+        JSON.stringify(params)
+      }
+      catch(e) {
+        throw ErrorObject.parseError(params)
+      }
+    }
+    else throw ErrorObject.invalidParams(params)
+  }
+}
+
+/**
+ * Checks whether the JSON-RPC error is a valid one,
+ * hence compatible with the JSON-RPC 2.0 specification
+ * @param error object to check
+ * @throws [[ErrorObject]] if invalid
+ */
+function checkError(error: any) {
+  if (!(error instanceof ErrorObject)) {
+    throw ErrorObject.internalError('Error MUST be an instance of ErrorObject!')
+  }
 }

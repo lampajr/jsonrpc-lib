@@ -1,5 +1,10 @@
-# dependencies
-node_modules
+# code
+.vscode
 
 # distribution
 dist
+
+# dependencies
+node_modules
+
+test.ts
