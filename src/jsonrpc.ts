@@ -46,6 +46,9 @@ class Serializer {
  * version and MUST be implemented by all JSON-RPC objects
  */
 export class JsonRpc extends Serializer {
+  /** Current JSON-RPC version supported */
+  static VERSION: string = '2.0';
+
   /** A String specifying the version of the JSON-RPC protocol. MUST be exactly "2.0". */
   readonly jsonrpc: string;
 
@@ -184,6 +187,8 @@ export class ErrorObject extends Serializer {
 /** Checks whether a value is an integer or not */
 const isInteger = Number.isInteger;
 
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
 /** Check whether the value is a number or not */
 function isNumber(val: any) {
   return typeof val === 'number';
@@ -253,4 +258,105 @@ function checkError(error: any) {
   if (!(error instanceof ErrorObject)) {
     throw ErrorObject.internalError('Error MUST be an instance of ErrorObject!');
   }
+}
+
+/************************* Parsing *************************/
+
+export type JsonRpcMessage = JsonRpcRequest | JsonRpcNotification | JsonRpcSuccess | JsonRpcError;
+
+/**
+ * Try to parse a string data into a JsonRpc object
+ * @param data data to parse
+ * @returns the specific JSON-RPC message object
+ */
+export function parse(data: any): JsonRpcMessage {
+  if (data == null || !isString(data)) {
+    throw ErrorObject.invalidRequest(data);
+  }
+
+  try {
+    let obj: JsonRpc = JSON.parse(data);
+    return parseJsonRpcMessage(obj);
+  } catch (err) {
+    throw ErrorObject.parseError(data);
+  }
+}
+
+/**
+ * Computes the specific JSON-RPC message object, given a generic one
+ * @param obj not-null valid JSON-RPC object
+ * @returns [[JsonRpcMessage]] the specific JSON-RPC message object
+ * @throws [[ErrorObject]] if the parsing fails
+ */
+function parseJsonRpcMessage(obj: JsonRpc): JsonRpcMessage {
+  let res: JsonRpcMessage;
+
+  if (obj.jsonrpc !== JsonRpc.VERSION) {
+    throw ErrorObject.invalidRequest(`Version ${obj.jsonrpc} not supported! Please use ${JsonRpc.VERSION} instead.`);
+  }
+
+  if (!hasOwnProperty.call(obj, 'id')) {
+    // the only message that has no id member is the [[JsonRpcNotification]] one
+    const notification = obj as JsonRpcNotification;
+    res = new JsonRpcNotification(notification.method, notification.params);
+    validateNotification(res as JsonRpcNotification);
+  } else if (hasOwnProperty.call(obj, 'method')) {
+    // then only message that has both id and method members is the [[JsonRpcRequest]] one
+    const request = obj as JsonRpcRequest;
+    res = new JsonRpcRequest(request.id, request.method, request.params);
+    validateRequest(res as JsonRpcRequest);
+  } else if (hasOwnProperty.call(obj, 'result')) {
+    const success = obj as JsonRpcSuccess;
+    res = new JsonRpcSuccess(success.id, success.result);
+    validateSuccess(res as JsonRpcSuccess);
+  } else if (hasOwnProperty.call(obj, 'error')) {
+    const error = obj as JsonRpcError;
+    if (error.error == null) {
+      throw ErrorObject.internalError('Error object MUST be not null!');
+    }
+    let err: ErrorObject = error.error as ErrorObject;
+    res = new JsonRpcError(error.id, new ErrorObject(err.code, err.message, err.data));
+    validateError(res as JsonRpcError);
+  } else {
+    // this is an invalid object
+    throw ErrorObject.invalidRequest(obj);
+  }
+
+  return res;
+}
+
+/**
+ * Validate a JSON-RPC Notification object
+ * @param notification [[JsonRpcNotification]] object
+ * @throws [[ErrorObject]] if the parsing fails
+ */
+function validateNotification(notification: JsonRpcNotification) {
+  throw new Error('Method not yet implemented');
+}
+
+/**
+ * Validate a JSON-RPC Request object
+ * @param request [[JsonRpcRequest]] object
+ * @throws [[ErrorObject]] if the parsing fails
+ */
+function validateRequest(request: JsonRpcRequest) {
+  throw new Error('Method not yet implemented');
+}
+
+/**
+ * Validate a JSON-RPC Success response object
+ * @param request [[JsonRpcSuccess]] object
+ * @throws [[ErrorObject]] if the parsing fails
+ */
+function validateSuccess(request: JsonRpcSuccess) {
+  throw new Error('Method not yet implemented');
+}
+
+/**
+ * Validate a JSON-RPC Error response object
+ * @param request [[JsonRpcError]] object
+ * @throws [[ErrorObject]] if the parsing fails
+ */
+function validateError(request: JsonRpcError) {
+  throw new Error('Method not yet implemented');
 }
