@@ -20,8 +20,7 @@
  * TODO: complete description
  */
 
-/************************* JSON-RPC 2.0 *************************/
-
+/******************************************* JSON-RPC 2.0 *****************************************/
 export type Value = number | string | boolean | object | null;
 export type Params = object | Value[];
 export type Id = string | number;
@@ -183,7 +182,7 @@ export class ErrorObject extends Serializer {
   }
 }
 
-/************************* Utilities *************************/
+/********************************************* Utilities *******************************************/
 /** Checks whether a value is an integer or not */
 const isInteger = Number.isInteger;
 
@@ -259,8 +258,8 @@ function checkError(error: any) {
     throw ErrorObject.internalError('Error MUST be an instance of ErrorObject!');
   }
 }
-
-/************************* Parsing *************************/
+/********************************************* Utilities *******************************************/
+/********************************************* Parsing *********************************************/
 
 export type JsonRpcMessage = JsonRpcRequest | JsonRpcNotification | JsonRpcSuccess | JsonRpcError;
 
@@ -269,26 +268,43 @@ export type JsonRpcMessage = JsonRpcRequest | JsonRpcNotification | JsonRpcSucce
  * @param data data to parse
  * @returns the specific JSON-RPC message object
  */
-export function parse(data: any): JsonRpcMessage {
+export function parse(data: any): JsonRpcMessage | JsonRpcMessage[] {
   if (data == null || !isString(data)) {
     throw ErrorObject.invalidRequest(data);
   }
 
   try {
-    let obj: JsonRpc = JSON.parse(data);
-    return parseJsonRpcMessage(obj);
+    let obj: JsonRpc | JsonRpc[] = JSON.parse(data);
+    // TODO: add generic control to check that is either an object (single) or an array of objects (batch)
+    if (isObject(obj)) {
+      return parseSingleJsonRpcMessage(obj as JsonRpc);
+    } else if (Array.isArray(obj)) {
+      return parseBatchJsonRpcMessage(obj as JsonRpc[]);
+    } else {
+      throw ErrorObject.invalidRequest(obj);
+    }
   } catch (err) {
     throw ErrorObject.parseError(data);
   }
 }
 
 /**
- * Computes the specific JSON-RPC message object, given a generic one
+ * Computes the specific JSON-RPC batch message object, given a generic one
+ * @param obj not-null valid JSON-RPC object
+ * @returns [[JsonRpcMessage]] array of specific JSON-RPC objects
+ * @throws [[ErrorObject]] if the parsing fails
+ */
+function parseBatchJsonRpcMessage(obj: JsonRpc[]): JsonRpcMessage[] {
+  throw new Error('Method not yet implemented!');
+}
+
+/**
+ * Computes the specific single JSON-RPC message object, given a generic one
  * @param obj not-null valid JSON-RPC object
  * @returns [[JsonRpcMessage]] the specific JSON-RPC message object
  * @throws [[ErrorObject]] if the parsing fails
  */
-function parseJsonRpcMessage(obj: JsonRpc): JsonRpcMessage {
+function parseSingleJsonRpcMessage(obj: JsonRpc): JsonRpcMessage {
   let res: JsonRpcMessage;
 
   if (obj.jsonrpc !== JsonRpc.VERSION) {
