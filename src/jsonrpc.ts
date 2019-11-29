@@ -146,7 +146,7 @@ export class JsonRpcError extends JsonRpcResponse {
  * JSON-RPC 2.0 error object that MUST be included
  * as member in the JSON-RPC response error
  */
-export class ErrorObject extends Serializer {
+export class ErrorObject extends Error {
   static parseError(data?: any): ErrorObject {
     return new ErrorObject(-32700, 'Parse error', data);
   }
@@ -169,16 +169,14 @@ export class ErrorObject extends Serializer {
 
   /** A Number that indicates the error type that occurred. This MUST be an integer. */
   public code: number;
-  /** A String providing a short description of the error. */
-  public message: string;
   /** A Primitive or Structured value that contains additional information about the error. This may be omitted. */
   public data?: any;
 
   constructor(code: number, message: string, data?: any) {
-    super();
+    super(message);
     this.code = code;
-    this.message = message;
     this.data = data;
+    Object.setPrototypeOf(this, ErrorObject.prototype);
   }
 }
 
@@ -242,7 +240,7 @@ function checkParams(params: any) {
         throw ErrorObject.parseError(params);
       }
     } else {
-      throw ErrorObject.invalidParams(params);
+      throw ErrorObject.invalidParams('Params MUST be an object or an ordered array of values');
     }
   }
 }
@@ -254,37 +252,51 @@ function checkParams(params: any) {
  * @throws [[ErrorObject]] if invalid
  */
 function checkError(error: any) {
+  if (!isObject(error)) {
+    throw ErrorObject.internalError('This error is not compatible with JSON-RPC 2.0 spec!');
+  }
+
   if (!(error instanceof ErrorObject)) {
-    throw ErrorObject.internalError('Error MUST be an instance of ErrorObject!');
+    const err = error as ErrorObject;
+    if (!isInteger(err.code)) {
+      throw ErrorObject.internalError('The error code MUST be an integer!');
+    }
+    if (!isString(err.message)) {
+      throw ErrorObject.internalError('The error message MUST be a string!');
+    }
   }
 }
-/********************************************* Utilities *******************************************/
+
 /********************************************* Parsing *********************************************/
 
 export type JsonRpcMessage = JsonRpcRequest | JsonRpcNotification | JsonRpcSuccess | JsonRpcError;
 
 /**
- * Try to parse a string data into a JsonRpc object
- * @param data data to parse
+ * Try to parse an object into a JsonRpc object, if valid
+ * @param data object to parse
  * @returns the specific JSON-RPC message object
  */
 export function parse(data: any): JsonRpcMessage | JsonRpcMessage[] {
   if (data == null || !isString(data)) {
-    throw ErrorObject.invalidRequest(data);
+    throw ErrorObject.invalidRequest('Message MUST be not null and in string format!');
   }
 
   try {
-    let obj: JsonRpc | JsonRpc[] = JSON.parse(data);
-    // TODO: add generic control to check that is either an object (single) or an array of objects (batch)
+    const obj: JsonRpc | JsonRpc[] = JSON.parse(data);
     if (isObject(obj)) {
       return parseSingleJsonRpcMessage(obj as JsonRpc);
     } else if (Array.isArray(obj)) {
       return parseBatchJsonRpcMessage(obj as JsonRpc[]);
     } else {
-      throw ErrorObject.invalidRequest(obj);
+      throw ErrorObject.invalidRequest('Message MUST be an object or an array of objects!');
     }
   } catch (err) {
-    throw ErrorObject.parseError(data);
+    if (err instanceof SyntaxError) {
+      // error thrown by the JSON.parse function
+      throw ErrorObject.parseError('Invalid JSON format');
+    } else {
+      throw err;
+    }
   }
 }
 
@@ -314,25 +326,25 @@ function parseSingleJsonRpcMessage(obj: JsonRpc): JsonRpcMessage {
   if (!hasOwnProperty.call(obj, 'id')) {
     // the only message that has no id member is the [[JsonRpcNotification]] one
     const notification = obj as JsonRpcNotification;
+    validateNotification(notification);
     res = new JsonRpcNotification(notification.method, notification.params);
-    validateNotification(res as JsonRpcNotification);
   } else if (hasOwnProperty.call(obj, 'method')) {
     // then only message that has both id and method members is the [[JsonRpcRequest]] one
     const request = obj as JsonRpcRequest;
+    validateRequest(request);
     res = new JsonRpcRequest(request.id, request.method, request.params);
-    validateRequest(res as JsonRpcRequest);
   } else if (hasOwnProperty.call(obj, 'result')) {
     const success = obj as JsonRpcSuccess;
+    validateSuccess(success);
     res = new JsonRpcSuccess(success.id, success.result);
-    validateSuccess(res as JsonRpcSuccess);
   } else if (hasOwnProperty.call(obj, 'error')) {
     const error = obj as JsonRpcError;
     if (error.error == null) {
       throw ErrorObject.internalError('Error object MUST be not null!');
     }
-    let err: ErrorObject = error.error as ErrorObject;
+    validateError(error);
+    const err: ErrorObject = error.error as ErrorObject;
     res = new JsonRpcError(error.id, new ErrorObject(err.code, err.message, err.data));
-    validateError(res as JsonRpcError);
   } else {
     // this is an invalid object
     throw ErrorObject.invalidRequest(obj);
@@ -342,21 +354,24 @@ function parseSingleJsonRpcMessage(obj: JsonRpc): JsonRpcMessage {
 }
 
 /**
- * Validate a JSON-RPC Notification object
- * @param notification [[JsonRpcNotification]] object
- * @throws [[ErrorObject]] if the parsing fails
- */
-function validateNotification(notification: JsonRpcNotification) {
-  throw new Error('Method not yet implemented');
-}
-
-/**
  * Validate a JSON-RPC Request object
  * @param request [[JsonRpcRequest]] object
  * @throws [[ErrorObject]] if the parsing fails
  */
 function validateRequest(request: JsonRpcRequest) {
-  throw new Error('Method not yet implemented');
+  checkId(request.id);
+  checkMethod(request.method);
+  checkParams(request.params);
+}
+
+/**
+ * Validate a JSON-RPC Notification object
+ * @param notification [[JsonRpcNotification]] object
+ * @throws [[ErrorObject]] if the parsing fails
+ */
+function validateNotification(notification: JsonRpcNotification) {
+  checkMethod(notification.method);
+  checkParams(notification.params);
 }
 
 /**
@@ -364,8 +379,8 @@ function validateRequest(request: JsonRpcRequest) {
  * @param request [[JsonRpcSuccess]] object
  * @throws [[ErrorObject]] if the parsing fails
  */
-function validateSuccess(request: JsonRpcSuccess) {
-  throw new Error('Method not yet implemented');
+function validateSuccess(success: JsonRpcSuccess) {
+  checkId(success.id);
 }
 
 /**
@@ -373,6 +388,20 @@ function validateSuccess(request: JsonRpcSuccess) {
  * @param request [[JsonRpcError]] object
  * @throws [[ErrorObject]] if the parsing fails
  */
-function validateError(request: JsonRpcError) {
-  throw new Error('Method not yet implemented');
+function validateError(error: JsonRpcError) {
+  checkId(error.id);
+  checkError(error.error);
 }
+
+/********************************************* Exports *********************************************/
+
+const jsonrpc = {
+  JsonRpc,
+  JsonRpcRequest,
+  JsonRpcNotification,
+  JsonRpcSuccess,
+  JsonRpcError,
+  parse,
+  parseSingleJsonRpcMessage,
+  parseBatchJsonRpcMessage,
+};
