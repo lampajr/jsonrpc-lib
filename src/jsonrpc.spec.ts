@@ -17,10 +17,9 @@
  * JSON-RPC 2.0 testing file
  */
 
-import { parse, ErrorObject, JsonRpc, JsonRpcRequest } from './jsonrpc';
+import { parse, ErrorObject, JsonRpc, JsonRpcRequest, JsonRpcSuccess, JsonRpcError, JsonRpcMessage, JsonRpcNotification } from './jsonrpc';
 
 describe('jsonrpc module tests', () => {
-
   describe('Serializer object', () => {
     describe('Serializer.serialize function', () => {
       test('JsonRpc', () => {
@@ -28,75 +27,173 @@ describe('jsonrpc module tests', () => {
         expect(JSON.stringify(obj)).toEqual(obj.serialize());
         expect(JSON.parse(obj.serialize())).toEqual(obj);
         expect(obj.serialize()).toStrictEqual('{"jsonrpc":"2.0"}');
-      })
+      });
 
       test('JsonRpcRequest', () => {
-        const obj = new JsonRpcRequest('id1', 'send', {'amount': 10});
+        const obj = new JsonRpcRequest('id1', 'send', { amount: 10 });
         expect(JSON.stringify(obj)).toEqual(obj.serialize());
         expect(JSON.parse(obj.serialize())).toEqual(obj);
         expect(obj.serialize()).toStrictEqual('{"jsonrpc":"2.0","id":"id1","method":"send","params":{"amount":10}}');
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('parse', () => {
     test('throw error if null data is received', () => {
+      const obj = null;
       expect(() => {
-        parse(null);
-      }).toThrow(ErrorObject.invalidRequest());
+        parse(obj);
+      }).toThrow(ErrorObject);
+      try {
+        parse(obj);
+      } catch (err) {
+        expect(err.code).toStrictEqual(ErrorObject.invalidRequest().code);
+      }
     });
 
     test('throw error if undefined data is received', () => {
+      const obj = undefined;
       expect(() => {
-        parse(null);
-      }).toThrow(ErrorObject.invalidRequest());
+        parse(obj);
+      }).toThrow(ErrorObject);
+      try {
+        parse(obj);
+      } catch (err) {
+        expect(err.code).toStrictEqual(ErrorObject.invalidRequest().code);
+      }
     });
 
     describe('check error is thrown when invalid json format data is received', () => {
       test('simple string', () => {
+        const obj = 'param1';
         expect(() => {
-          parse('param1');
-        }).toThrow(ErrorObject.parseError());
+          parse(obj);
+        }).toThrow(ErrorObject);
+        try {
+          parse(obj);
+        } catch (err) {
+          expect(err.code).toStrictEqual(ErrorObject.parseError().code);
+        }
       });
 
       test('not closed brace', () => {
+        const obj = '{"param1":3';
         expect(() => {
-          parse('{"param1":3');
-        }).toThrow(ErrorObject.parseError());
+          parse(obj);
+        }).toThrow(ErrorObject);
+        try {
+          parse(obj);
+        } catch (err) {
+          expect(err.code).toStrictEqual(ErrorObject.parseError().code);
+        }
       });
 
       test('not closed bracket', () => {
+        const obj = '["param1"';
         expect(() => {
-          parse('["param1"');
-        }).toThrow(ErrorObject.parseError());
+          parse(obj);
+        }).toThrow(ErrorObject);
+        try {
+          parse(obj);
+        } catch (err) {
+          expect(err.code).toStrictEqual(ErrorObject.parseError().code);
+        }
       });
 
       test('invalid object', () => {
+        const obj = '{"param1"}';
         expect(() => {
-          parse('{"param1"}');
-        }).toThrow(ErrorObject.parseError());
+          parse(obj);
+        }).toThrow(ErrorObject);
+        try {
+          parse(obj);
+        } catch (err) {
+          expect(err.code).toStrictEqual(ErrorObject.parseError().code);
+        }
       });
     });
 
     describe('check the payload is valid JSON-RPC 2.0 message', () => {
       test('check error is thrown if neither an object or an array', () => {
+        const obj = '"param1"';
         expect(() => {
-          parse('"param1"');
-        }).toThrow(ErrorObject.invalidRequest());
-        expect(() => {
-          parse('3');
-        }).toThrow(ErrorObject.invalidRequest());
+          parse(obj);
+        }).toThrow(ErrorObject);
+        try {
+          parse(obj);
+        } catch (err) {
+          expect(err.code).toStrictEqual(ErrorObject.invalidRequest().code);
+        }
       });
 
-      describe('check single JSON-RPC object parsing and validation', () => {
-        describe('check JsonRpcError', () => {
-          
-        })
-      })
+      test('missing jsonrpc version', () => {
+        const obj =
+          '{"id":1, "error": {"code": -32700, "message": "Parse error", "data": "invalid request structure"}}';
+        expect(() => {
+          parse(obj);
+        }).toThrow(ErrorObject);
+        try {
+          parse(obj);
+        } catch (err) {
+          expect(err.code).toStrictEqual(ErrorObject.invalidRequest().code);
+        }
+      });
 
-      describe('check batch of JSON-RPC objects parsing and validation', () => {
-        
-      })
+      test('unsupported jsonrpc version', () => {
+        const obj =
+          '{"jsonrpc":"1.0", "id":1, "error": {"code": -32700, "message": "Parse error", "data": "invalid request structure"}}';
+        expect(() => {
+          parse(obj);
+        }).toThrow(ErrorObject);
+        try {
+          parse(obj);
+        } catch (err) {
+          expect(err.code).toStrictEqual(ErrorObject.invalidRequest().code);
+          expect(err.data).toStrictEqual(`Version 1.0 not supported! Please use ${JsonRpc.VERSION} instead.`);
+        }
+      });
+
+      describe('check single JSON-RPC message parsing and validation', () => {
+        describe('test JsonRpcError', () => {
+          test('valid error response', () => {
+            const obj =
+              '{"jsonrpc":"2.0","id":1,"error":{"code":-32700,"message":"Parse error","data":{"info":"invalid request structure","limit":3}}}';
+            expect(() => {
+              parse(obj);
+            }).not.toThrow(ErrorObject);
+            expect(parse(obj)).toBeInstanceOf(JsonRpcError);
+            expect((parse(obj) as JsonRpcError).serialize()).toEqual(obj);
+          });
+        });
+
+        describe('test JsonRpcSuccess', () => {
+          test('valid request message', () => {
+            const obj =
+              '{"jsonrpc":"2.0","id":1,"method":"invoke","params":{"param1":3,"param2":[3,4,5]}}'
+              expect(() => {
+                parse(obj);
+              }).not.toThrow(ErrorObject);
+              expect(parse(obj)).toBeInstanceOf(JsonRpcRequest);
+              expect((parse(obj) as JsonRpcRequest).serialize()).toEqual(obj);
+          })
+        })
+
+        describe('test JsonRpcNotification', () => {
+          test('valid notification message', () => {
+            const obj =
+              '{"jsonrpc":"2.0","method":"invoke","params":{"param1":3,"param2":[3,4,5]}}';
+              expect(() => {
+                parse(obj);
+              }).not.toThrow(ErrorObject);
+              expect(parse(obj)).toBeInstanceOf(JsonRpcNotification)
+              expect((parse(obj) as JsonRpcNotification).serialize()).toEqual(obj);
+          })
+        })
+
+
+      });
+
+      describe('check batch of JSON-RPC objects parsing and validation', () => {});
     });
   });
 });
