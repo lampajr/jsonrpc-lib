@@ -17,7 +17,16 @@
  * JSON-RPC 2.0 testing file
  */
 
-import { parse, ErrorObject, JsonRpc, JsonRpcRequest, JsonRpcSuccess, JsonRpcError, JsonRpcMessage, JsonRpcNotification } from './jsonrpc';
+import {
+  parse,
+  ErrorObject,
+  JsonRpc,
+  JsonRpcRequest,
+  JsonRpcSuccess,
+  JsonRpcError,
+  JsonRpcMessage,
+  JsonRpcNotification,
+} from './jsonrpc';
 
 describe('jsonrpc module tests', () => {
   describe('Serializer object', () => {
@@ -167,30 +176,37 @@ describe('jsonrpc module tests', () => {
         });
 
         describe('test JsonRpcSuccess', () => {
+          test('valid success response', () => {
+            const obj = '{"jsonrpc":"2.0","id":1,"result":"OK"}';
+            expect(() => {
+              parse(obj);
+            }).not.toThrow(ErrorObject);
+            expect(parse(obj)).toBeInstanceOf(JsonRpcSuccess);
+            expect((parse(obj) as JsonRpcSuccess).serialize()).toEqual(obj);
+          });
+        });
+
+        describe('test JsonRpcRequest', () => {
           test('valid request message', () => {
-            const obj =
-              '{"jsonrpc":"2.0","id":1,"method":"invoke","params":{"param1":3,"param2":[3,4,5]}}'
-              expect(() => {
-                parse(obj);
-              }).not.toThrow(ErrorObject);
-              expect(parse(obj)).toBeInstanceOf(JsonRpcRequest);
-              expect((parse(obj) as JsonRpcRequest).serialize()).toEqual(obj);
-          })
-        })
+            const obj = '{"jsonrpc":"2.0","id":1,"method":"invoke","params":{"param1":3,"param2":[3,4,5]}}';
+            expect(() => {
+              parse(obj);
+            }).not.toThrow(ErrorObject);
+            expect(parse(obj)).toBeInstanceOf(JsonRpcRequest);
+            expect((parse(obj) as JsonRpcRequest).serialize()).toEqual(obj);
+          });
+        });
 
         describe('test JsonRpcNotification', () => {
           test('valid notification message', () => {
-            const obj =
-              '{"jsonrpc":"2.0","method":"invoke","params":{"param1":3,"param2":[3,4,5]}}';
-              expect(() => {
-                parse(obj);
-              }).not.toThrow(ErrorObject);
-              expect(parse(obj)).toBeInstanceOf(JsonRpcNotification)
-              expect((parse(obj) as JsonRpcNotification).serialize()).toEqual(obj);
-          })
-        })
-
-
+            const obj = '{"jsonrpc":"2.0","method":"invoke","params":{"param1":3,"param2":[3,4,5]}}';
+            expect(() => {
+              parse(obj);
+            }).not.toThrow(ErrorObject);
+            expect(parse(obj)).toBeInstanceOf(JsonRpcNotification);
+            expect((parse(obj) as JsonRpcNotification).serialize()).toEqual(obj);
+          });
+        });
       });
 
       describe('check batch of JSON-RPC objects parsing and validation', () => {});
