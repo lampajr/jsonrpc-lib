@@ -1,0 +1,15 @@
+# Config files
+tsconfig.json
+tslint.json
+jestconfig.json
+.prettierc
+
+# source code and tests
+src
+
+# documentation folder
+doc
+message-class-mapping.png
+message-class-mapping.ods
+
+test.ts

@@ -8,3 +8,5 @@ dist
 node_modules
 
 test.ts
+
+message-class-mapping.ods
