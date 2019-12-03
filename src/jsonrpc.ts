@@ -17,7 +17,7 @@
  * JSON-RPC 2.0 implementation that allows user to serialize and parse objects
  * under the JSON-RPC protocol
  * * Specification: * https://www.jsonrpc.org/specification
- * TODO: complete description
+ * * README * https://github.com/lampajr/jsonrpc-lib/blob/master/README.md
  */
 
 /******************************************* JSON-RPC 2.0 *****************************************/
