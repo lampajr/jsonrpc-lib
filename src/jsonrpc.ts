@@ -146,7 +146,7 @@ export class JsonRpcError extends JsonRpcResponse {
  * JSON-RPC 2.0 error object that MUST be included
  * as member in the JSON-RPC response error
  */
-export class ErrorObject extends Error {
+export class ErrorObject extends Serializer {
   static parseError(data?: any): ErrorObject {
     return new ErrorObject(-32700, 'Parse error', data);
   }
@@ -169,14 +169,16 @@ export class ErrorObject extends Error {
 
   /** A Number that indicates the error type that occurred. This MUST be an integer. */
   public code: number;
+  /** TODO: */
+  public message: string;
   /** A Primitive or Structured value that contains additional information about the error. This may be omitted. */
   public data?: any;
 
   constructor(code: number, message: string, data?: any) {
-    super(message);
+    super();
     this.code = code;
+    this.message = message;
     this.data = data;
-    Object.setPrototypeOf(this, ErrorObject.prototype);
   }
 }
 
