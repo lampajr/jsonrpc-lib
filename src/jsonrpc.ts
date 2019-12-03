@@ -187,17 +187,17 @@ const isInteger = Number.isInteger;
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 /** Check whether the value is a number or not */
-function isNumber(val: any) {
+function isNumber(val: any): boolean {
   return typeof val === 'number';
 }
 
 /** Check whether the value is a string or not */
-function isString(val: any) {
+function isString(val: any): boolean {
   return typeof val === 'string';
 }
 
 /** Check whether the value is an object or not */
-function isObject(val: any) {
+function isObject(val: any): boolean {
   return typeof val === 'object';
 }
 
@@ -219,7 +219,7 @@ function checkId(id: any): void {
  * @param method string method to check
  * @throws [[ErrorObject]] if invalid
  */
-function checkMethod(method: any) {
+function checkMethod(method: any): void {
   if (!isString(method)) {
     throw ErrorObject.parseError('The method MUST be a string');
   }
@@ -231,7 +231,7 @@ function checkMethod(method: any) {
  * @param params object to check
  * @throws [[ErrorObject]] if invalid
  */
-function checkParams(params: any) {
+function checkParams(params: any): void {
   if (params !== undefined) {
     if (isObject(params) || Array.isArray(params)) {
       try {
@@ -251,7 +251,7 @@ function checkParams(params: any) {
  * @param error object to check
  * @throws [[ErrorObject]] if invalid
  */
-function checkError(error: any) {
+function checkError(error: any): void {
   if (!isObject(error)) {
     throw ErrorObject.internalError('This error is not compatible with JSON-RPC 2.0 spec!');
   }
@@ -327,9 +327,9 @@ export function parse(data: any): JsonRpcMessage | JsonRpcMessage[] {
   try {
     const obj: JsonRpc | JsonRpc[] = JSON.parse(data);
     if (isObject(obj)) {
-      return parseSingleJsonRpcMessage(obj as JsonRpc);
+      return parseJsonRpcMessage(obj as JsonRpc);
     } else if (Array.isArray(obj)) {
-      return parseBatchJsonRpcMessage(obj as JsonRpc[]);
+      return parseJsonRpcMessageBatch(obj as JsonRpc[]);
     } else {
       throw ErrorObject.invalidRequest('Message MUST be an object or an array of objects!');
     }
@@ -349,10 +349,10 @@ export function parse(data: any): JsonRpcMessage | JsonRpcMessage[] {
  * @returns [[JsonRpcMessage]] array of specific JSON-RPC objects
  * @throws [[ErrorObject]] if the parsing fails
  */
-function parseBatchJsonRpcMessage(objs: JsonRpc[]): JsonRpcMessage[] {
+function parseJsonRpcMessageBatch(objs: JsonRpc[]): JsonRpcMessage[] {
   let batch: JsonRpcMessage[] = [];
   for (let i = 0; i < objs.length; i = i + 1) {
-    batch.push(parseSingleJsonRpcMessage(objs[i]));
+    batch.push(parseJsonRpcMessage(objs[i]));
   }
   return batch;
 }
@@ -363,7 +363,7 @@ function parseBatchJsonRpcMessage(objs: JsonRpc[]): JsonRpcMessage[] {
  * @returns [[JsonRpcMessage]] the specific JSON-RPC message object
  * @throws [[ErrorObject]] if the parsing fails
  */
-function parseSingleJsonRpcMessage(obj: JsonRpc): JsonRpcMessage {
+function parseJsonRpcMessage(obj: JsonRpc): JsonRpcMessage {
   let res: JsonRpcMessage;
 
   if (obj.jsonrpc !== JsonRpc.VERSION) {
@@ -405,7 +405,7 @@ function parseSingleJsonRpcMessage(obj: JsonRpc): JsonRpcMessage {
  * @param request [[JsonRpcRequest]] object
  * @throws [[ErrorObject]] if the parsing fails
  */
-function validateRequest(request: JsonRpcRequest) {
+function validateRequest(request: JsonRpcRequest): void {
   checkId(request.id);
   checkMethod(request.method);
   checkParams(request.params);
@@ -416,7 +416,7 @@ function validateRequest(request: JsonRpcRequest) {
  * @param notification [[JsonRpcNotification]] object
  * @throws [[ErrorObject]] if the parsing fails
  */
-function validateNotification(notification: JsonRpcNotification) {
+function validateNotification(notification: JsonRpcNotification): void {
   checkMethod(notification.method);
   checkParams(notification.params);
 }
@@ -426,7 +426,7 @@ function validateNotification(notification: JsonRpcNotification) {
  * @param request [[JsonRpcSuccess]] object
  * @throws [[ErrorObject]] if the parsing fails
  */
-function validateSuccess(success: JsonRpcSuccess) {
+function validateSuccess(success: JsonRpcSuccess): void {
   checkId(success.id);
 }
 
@@ -435,7 +435,7 @@ function validateSuccess(success: JsonRpcSuccess) {
  * @param request [[JsonRpcError]] object
  * @throws [[ErrorObject]] if the parsing fails
  */
-function validateError(error: JsonRpcError) {
+function validateError(error: JsonRpcError): void {
   checkId(error.id);
   checkError(error.error);
 }
@@ -448,7 +448,11 @@ const jsonrpc = {
   JsonRpcNotification,
   JsonRpcSuccess,
   JsonRpcError,
+  request,
+  notification,
+  success,
+  error,
   parse,
-  parseSingleJsonRpcMessage,
-  parseBatchJsonRpcMessage,
+  parseJsonRpcMessage,
+  parseJsonRpcMessageBatch,
 };
