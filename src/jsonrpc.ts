@@ -267,6 +267,49 @@ function checkError(error: any) {
   }
 }
 
+/**************************************** Messages Generation **************************************/
+
+/**
+ * Generates a new [[JsonRpcRequest]] message
+ * @param id request identifier
+ * @param method name of the method to invoke
+ * @param params parameters needed for method invocation
+ * @returns new [[JsonRpcRequest]] instance
+ */
+export function request(id: Id, method: string, params: Params): JsonRpcRequest {
+  return new JsonRpcRequest(id, method, params)
+}
+
+/**
+ * Generates a new [[JsonRpcNotification]] message
+ * @param method name of the method to invoke
+ * @param params parameters needed for method invocation
+ * @returns new [[JsonRpcNotification]] instance
+ */
+export function notification(method: string, params: Params): JsonRpcNotification {
+  return new JsonRpcNotification(method, params)
+}
+
+/**
+ * Generates a new [[JsonRpcRequest]] message
+ * @param id request identifier
+ * @param result result of a previous jsonrpc invocation
+ * @returns new [[JsonRpcSuccess]] instance
+ */
+export function success(id: Id, result: any): JsonRpcSuccess {
+  return new JsonRpcSuccess(id, result)
+}
+
+/**
+ * Generates a new [[JsonRpcRequest]] message
+ * @param id request identifier
+ * @param result result of a previous jsonrpc invocation
+ * @returns new [[JsonRpcSuccess]] instance
+ */
+export function error(id: Id, err: ErrorObject): JsonRpcError {
+  return new JsonRpcError(id, err)
+}
+
 /********************************************* Parsing *********************************************/
 
 export type JsonRpcMessage = JsonRpcRequest | JsonRpcNotification | JsonRpcSuccess | JsonRpcError;
