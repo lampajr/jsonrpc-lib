@@ -10,7 +10,8 @@
     "build": "npm run format && npm run lint && tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage",
+    "doc": "typedoc --out doc src/jsonrpc.ts"
   },
   "repository": {
     "type": "git",
