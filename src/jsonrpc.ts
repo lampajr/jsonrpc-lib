@@ -291,8 +291,8 @@ export function notification(method: string, params: Params): JsonRpcNotificatio
 }
 
 /**
- * Generates a new [[JsonRpcRequest]] message
- * @param id request identifier
+ * Generates a new [[JsonRpcSuccess]] message
+ * @param id success response identifier
  * @param result result of a previous jsonrpc invocation
  * @returns new [[JsonRpcSuccess]] instance
  */
@@ -301,10 +301,10 @@ export function success(id: Id, result: any): JsonRpcSuccess {
 }
 
 /**
- * Generates a new [[JsonRpcRequest]] message
- * @param id request identifier
- * @param result result of a previous jsonrpc invocation
- * @returns new [[JsonRpcSuccess]] instance
+ * Generates a new [[JsonRpcError]] message
+ * @param id error response identifier
+ * @param err [[ErrorObject]] instance which includes details about the error
+ * @returns new [[JsonRpcError]] instance
  */
 export function error(id: Id, err: ErrorObject): JsonRpcError {
   return new JsonRpcError(id, err);
