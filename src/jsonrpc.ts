@@ -277,7 +277,7 @@ function checkError(error: any) {
  * @returns new [[JsonRpcRequest]] instance
  */
 export function request(id: Id, method: string, params: Params): JsonRpcRequest {
-  return new JsonRpcRequest(id, method, params)
+  return new JsonRpcRequest(id, method, params);
 }
 
 /**
@@ -287,7 +287,7 @@ export function request(id: Id, method: string, params: Params): JsonRpcRequest 
  * @returns new [[JsonRpcNotification]] instance
  */
 export function notification(method: string, params: Params): JsonRpcNotification {
-  return new JsonRpcNotification(method, params)
+  return new JsonRpcNotification(method, params);
 }
 
 /**
@@ -297,7 +297,7 @@ export function notification(method: string, params: Params): JsonRpcNotificatio
  * @returns new [[JsonRpcSuccess]] instance
  */
 export function success(id: Id, result: any): JsonRpcSuccess {
-  return new JsonRpcSuccess(id, result)
+  return new JsonRpcSuccess(id, result);
 }
 
 /**
@@ -307,7 +307,7 @@ export function success(id: Id, result: any): JsonRpcSuccess {
  * @returns new [[JsonRpcSuccess]] instance
  */
 export function error(id: Id, err: ErrorObject): JsonRpcError {
-  return new JsonRpcError(id, err)
+  return new JsonRpcError(id, err);
 }
 
 /********************************************* Parsing *********************************************/
@@ -345,12 +345,16 @@ export function parse(data: any): JsonRpcMessage | JsonRpcMessage[] {
 
 /**
  * Computes the specific JSON-RPC batch message object, given a generic one
- * @param obj not-null valid JSON-RPC object
+ * @param objs not-null valid list of JSON-RPC objects
  * @returns [[JsonRpcMessage]] array of specific JSON-RPC objects
  * @throws [[ErrorObject]] if the parsing fails
  */
-function parseBatchJsonRpcMessage(obj: JsonRpc[]): JsonRpcMessage[] {
-  throw new Error('Method not yet implemented!');
+function parseBatchJsonRpcMessage(objs: JsonRpc[]): JsonRpcMessage[] {
+  let batch: JsonRpcMessage[] = [];
+  for (let i = 0; i < objs.length; i = i + 1) {
+    batch.push(parseSingleJsonRpcMessage(objs[i]));
+  }
+  return batch;
 }
 
 /**
