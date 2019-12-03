@@ -169,7 +169,7 @@ export class ErrorObject extends Serializer {
 
   /** A Number that indicates the error type that occurred. This MUST be an integer. */
   public code: number;
-  /** TODO: */
+  /** A String providing a short description of the error. */
   public message: string;
   /** A Primitive or Structured value that contains additional information about the error. This may be omitted. */
   public data?: any;
@@ -278,7 +278,7 @@ function checkError(error: any): void {
  * @param params parameters needed for method invocation
  * @returns new [[JsonRpcRequest]] instance
  */
-export function request(id: Id, method: string, params: Params): JsonRpcRequest {
+export function generateRequest(id: Id, method: string, params: Params): JsonRpcRequest {
   return new JsonRpcRequest(id, method, params);
 }
 
@@ -288,7 +288,7 @@ export function request(id: Id, method: string, params: Params): JsonRpcRequest 
  * @param params parameters needed for method invocation
  * @returns new [[JsonRpcNotification]] instance
  */
-export function notification(method: string, params: Params): JsonRpcNotification {
+export function generateNotification(method: string, params: Params): JsonRpcNotification {
   return new JsonRpcNotification(method, params);
 }
 
@@ -298,7 +298,7 @@ export function notification(method: string, params: Params): JsonRpcNotificatio
  * @param result result of a previous jsonrpc invocation
  * @returns new [[JsonRpcSuccess]] instance
  */
-export function success(id: Id, result: any): JsonRpcSuccess {
+export function generateSuccess(id: Id, result: any): JsonRpcSuccess {
   return new JsonRpcSuccess(id, result);
 }
 
@@ -308,7 +308,7 @@ export function success(id: Id, result: any): JsonRpcSuccess {
  * @param err [[ErrorObject]] instance which includes details about the error
  * @returns new [[JsonRpcError]] instance
  */
-export function error(id: Id, err: ErrorObject): JsonRpcError {
+export function generateError(id: Id, err: ErrorObject): JsonRpcError {
   return new JsonRpcError(id, err);
 }
 
@@ -352,9 +352,9 @@ export function parse(data: any): JsonRpcMessage | JsonRpcMessage[] {
  * @throws [[ErrorObject]] if the parsing fails
  */
 function parseJsonRpcMessageBatch(objs: JsonRpc[]): JsonRpcMessage[] {
-  let batch: JsonRpcMessage[] = [];
-  for (let i = 0; i < objs.length; i = i + 1) {
-    batch.push(parseJsonRpcMessage(objs[i]));
+  const batch: JsonRpcMessage[] = [];
+  for (const obj of objs) {
+    batch.push(parseJsonRpcMessage(obj));
   }
   return batch;
 }
@@ -450,11 +450,14 @@ const jsonrpc = {
   JsonRpcNotification,
   JsonRpcSuccess,
   JsonRpcError,
-  request,
-  notification,
-  success,
-  error,
+  request: generateRequest,
+  notification: generateNotification,
+  success: generateSuccess,
+  error: generateError,
   parse,
   parseJsonRpcMessage,
   parseJsonRpcMessageBatch,
 };
+
+export default jsonrpc;
+export { jsonrpc };
