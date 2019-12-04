@@ -451,7 +451,7 @@ const jsonrpc = {
   JsonRpcSuccess,
   JsonRpcError,
   generateRequest,
-  notification: generateNotification,
+  generateNotification,
   generateSuccess,
   generateError,
   parse,
