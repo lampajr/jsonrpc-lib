@@ -58,9 +58,81 @@ Using *typescript*:
 import jsonrpc from 'jsonrpc-lib'
 ```
 
-This package provides some help functions that allow developers to easily generate instances of JSON-RPC2 messages and to parse string into JSON-RPC2 objects. 
+This package provides some help functions that allow developers to easily generate instances of JSON-RPC2 messages, a complete mapping among JSON-RPC2 messages and jsonrpc-lib classes is explained in **Table 1**.
+
+```typescript
+jsonrpc.generateRequest(...)	 	// generate a JsonRpcRequest object
+jsonrpc.generateNotification(...) 	// generate a JsonRpcNotification object
+jsonrpc.generateSuccess(...)		// generate a JsonRpcSuccess response
+jsonrpc.generateError(...)			// generate a JsonRpcError response
+```
 
 <br/>
 
 <img src="message-class-mapping.png" width="600px">
+
+**Table 1** provide a mapping between the JSON-RPC2 messages and the equivalent jsonrpc-lib classes
+
+### Parsing
+
+Moreover this package provides a way to parse string payload messages (e.g., received from http request) into JSON-RPC2 objects (i.e., jsonrpc-lib classes) using a function called *parse*. This function parse the string data checking if it is a valid JSON-RPC2 message, if so it generate the equivalent class instance, otherwise it throws an error object which contains information about what went wrong during parsing. This object is a valid error object that can be put inside the JsonRpcError response and then sent to the client. The *parse* function can be easily used as follow:
+
+```typescript
+const rpcMessage = jsonrpc.parse(msg);
+```
+
+where ```rpcMessage``` will contain the class instance of the specific parsed msg, if valid, otherwise an ErrorObject will be thrown, hence the function should be properly surrounded by the *try-catch* statement.
+
+In order to avoid the function to throws an Error, the ```msg``` data should be a valid JSON-RPC2 payload or an array of them. 
+
+
+
+## Examples
+
+### Parse
+
+**Success**
+
+This example shows a succeed invocation of the *parse* function, that will generate the equivalent JsonRpc class of the ```msg``` parsed.
+
+```typescript
+const msg = '{"jsonrpc":"2.0", "id":"abcdefg", "method":"send", "params": {"from": "my-addr", "to":"your-addr", "amount":50}}';
+
+try {
+    const rpcMessage = jsonrpc.parse(msg);  // execution succeed
+    // rpcMessage is an instance of JsonRpcRequest
+    //{
+    //	jsonrpc: "2.0",
+    //	id: "abcdefg",
+    //	method: "send",
+    //	params: {
+    //		"from": "my-addr",
+    //		"to": "your-addr",
+    //		"amount": 50
+	//	}
+    //}
+} catch(err) {
+    console.log(err)  // this won't be executed
+}
+```
+
+**Fail**
+
+This, instead, provide ad example of failed invocation. In this case the failure is due to the fact that the client is trying to used an unsupported jsonrpc version.
+
+```typescript
+const msg = '{"jsonrpc":"1.0", "id":"abcdefg", "method":"send", "params": {"from": "my-addr", "to":"your-addr", "amount":50}}';
+
+try {
+    // execution will fail since the jsonrpc 1.0 version is not supported
+    const rpcMessage = jsonrpc.parse(msg); 
+} catch(err) {
+    console.log(err)  // this error is an ErrorObject instace
+    //{
+    //	code: -32600
+    //	message: "Invalid request"
+    //	data: "Version 1.0 not supported! Please use 2.0 instead."
+    //}
+}
+```
 
