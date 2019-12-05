@@ -3,6 +3,7 @@ tsconfig.json
 tslint.json
 jestconfig.json
 .prettierc
+.gitattributes
 
 # source code and tests
 src
