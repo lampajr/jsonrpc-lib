@@ -7,6 +7,4 @@ dist
 # dependencies
 node_modules
 
-test.ts
-
 message-class-mapping.ods
