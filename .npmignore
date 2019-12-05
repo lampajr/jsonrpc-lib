@@ -8,7 +8,7 @@ jestconfig.json
 src
 
 # documentation folder
-doc
+docs
 message-class-mapping.png
 message-class-mapping.ods
 
