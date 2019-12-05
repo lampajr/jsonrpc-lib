@@ -60,6 +60,14 @@ import jsonrpc from 'jsonrpc-lib'
 
 This package provides some help functions that allow developers to easily generate instances of JSON-RPC2 messages, a complete mapping among JSON-RPC2 messages and jsonrpc-lib classes is explained in **Table 1**.
 
+<br/>
+
+<img src="message-class-mapping.png" width="600px">
+
+**Table 1** provide a mapping between the JSON-RPC2 messages and the equivalent jsonrpc-lib classes
+
+You can easily generate new jsonrpc2 instances using the following functions:
+
 ```typescript
 jsonrpc.generateRequest(...)	 	// generate a JsonRpcRequest object
 jsonrpc.generateNotification(...) 	// generate a JsonRpcNotification object
@@ -67,11 +75,7 @@ jsonrpc.generateSuccess(...)		// generate a JsonRpcSuccess response
 jsonrpc.generateError(...)			// generate a JsonRpcError response
 ```
 
-<br/>
 
-<img src="message-class-mapping.png" width="600px">
-
-**Table 1** provide a mapping between the JSON-RPC2 messages and the equivalent jsonrpc-lib classes
 
 ### Parsing
 

@@ -112,13 +112,14 @@
 				<p>Using <em>typescript</em>:</p>
 				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> jsonrpc <span class="hljs-keyword">from</span> <span class="hljs-string">'jsonrpc-lib'</span></code></pre>
 				<p>This package provides some help functions that allow developers to easily generate instances of JSON-RPC2 messages, a complete mapping among JSON-RPC2 messages and jsonrpc-lib classes is explained in <strong>Table 1</strong>.</p>
+				<br/>
+				<img src="message-class-mapping.png" width="600px">
+				<p><strong>Table 1</strong> provide a mapping between the JSON-RPC2 messages and the equivalent jsonrpc-lib classes</p>
+				<p>You can easily generate new jsonrpc2 instances using the following functions:</p>
 				<pre><code class="language-typescript">jsonrpc.generateRequest(...)         <span class="hljs-comment">// generate a JsonRpcRequest object</span>
 jsonrpc.generateNotification(...)     <span class="hljs-comment">// generate a JsonRpcNotification object</span>
 jsonrpc.generateSuccess(...)        <span class="hljs-comment">// generate a JsonRpcSuccess response</span>
 jsonrpc.generateError(...)            <span class="hljs-comment">// generate a JsonRpcError response</span></code></pre>
-				<br/>
-				<img src="message-class-mapping.png" width="600px">
-				<p><strong>Table 1</strong> provide a mapping between the JSON-RPC2 messages and the equivalent jsonrpc-lib classes</p>
 				<a href="#parsing" id="parsing" style="color: inherit; text-decoration: none;">
 					<h3>Parsing</h3>
 				</a>

@@ -14,10 +14,9 @@
  *
  *
  *
- * JSON-RPC 2.0 implementation that allows user to serialize and parse objects
- * under the JSON-RPC protocol
+ * JSON-RPC 2.0 implementation to serialize and parse jsonrpc objects in nodejs
  * * Specification: * https://www.jsonrpc.org/specification
- * * README * https://github.com/lampajr/jsonrpc-lib/blob/master/README.md
+ * * README: * https://github.com/lampajr/jsonrpc-lib/blob/master/README.md
  */
 
 /******************************************* JSON-RPC 2.0 *****************************************/
