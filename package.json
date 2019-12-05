@@ -4,6 +4,7 @@
   "description": "JSON-RPC 2.0 parser and serializer nodejs module",
   "main": "dist/jsonrpc.ts",
   "types": "dist/jsonrpc.d.ts",
+  "engines": ">= 10.16.3",
   "scripts": {
     "prebuild": "rimraf dist",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
