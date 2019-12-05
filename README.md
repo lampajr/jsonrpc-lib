@@ -1,4 +1,9 @@
 # JSON-RPC 2.0 library
+
+[![license](https://img.shields.io/github/license/lampajr/jsonrpc-lib?style=plastic)]
+[![version](https://img.shields.io/github/package-json/v/lampajr/jsonrpc-lib?style=plastic)]
+[![size](https://img.shields.io/github/repo-size/lampajr/jsonrpc-lib?style=plastic)]
+
 jsonrpc-lib is a nodejs package for parsing and serialising JSON-RPC2 messages.
 
 Inspired by [jsonrpc-lite](https://github.com/teambition/jsonrpc-lite/blob/master/README.md).
