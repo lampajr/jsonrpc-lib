@@ -151,3 +151,8 @@ try {
 }
 ```
 
+## Questions and Contributing
+
+Feel free to post questions and problems on the issue tracker. Pull requests are welcome!
+
+Feel free to fork and modify or add new features and functionality to the library
