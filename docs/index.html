@@ -64,10 +64,109 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<a href="#jsonrpc-lib" id="jsonrpc-lib" style="color: inherit; text-decoration: none;">
-					<h1>jsonrpc-lib</h1>
+				<a href="#json-rpc-20-library" id="json-rpc-20-library" style="color: inherit; text-decoration: none;">
+					<h1>JSON-RPC 2.0 library</h1>
 				</a>
-				<p>JSON-RPC2 parser and serializer nodejs module</p>
+				<p>jsonrpc-lib is a nodejs package for parsing and serialising JSON-RPC2 messages.</p>
+				<p>Inspired by <a href="https://github.com/teambition/jsonrpc-lite/blob/master/README.md">jsonrpc-lite</a>.</p>
+				<p><strong>Version</strong>: 0.1.0</p>
+				<p><strong>Date</strong>: December 3, 2019</p>
+				<p><strong>Author</strong>: Andrea Lamparelli</p>
+				<a href="#protocol-json-rpc2" id="protocol-json-rpc2" style="color: inherit; text-decoration: none;">
+					<h2>Protocol: JSON-RPC2</h2>
+				</a>
+				<p>This package implements the aforementioned <strong>JSON-RPC2</strong>, which is  is a stateless, light-weight remote procedure call (RPC) protocol. It is transport agnostic in that the concepts can be used within the  same process, over sockets, over http, or in many various message  passing environments. It uses <a href="http://www.json.org">JSON</a> (<a href="http://www.ietf.org/rfc/rfc4627.txt">RFC 4627</a>) as data format. This protocol defines three different kind of message, all of them share a common field called <em>jsonrpc</em>, which is a string specifying the version of the JSON-RPC protocol. In our case it MUST be exactly &quot;2.0&quot;.</p>
+				<a href="#request" id="request" style="color: inherit; text-decoration: none;">
+					<h4>Request</h4>
+				</a>
+				<p>An rpc call is represented by sending a Request object to a Server. In addition to the jsonrpc field, this message has the following member:</p>
+				<ul>
+					<li><em>id</em>, An identifier established by the Client that MUST contain a String, Number, or NULL value if included.</li>
+					<li><em>method</em>, A String containing the name of the method to be invoked.</li>
+					<li><em>params</em>, A Structured value that holds the parameter values to be used during the invocation of the method. </li>
+				</ul>
+				<a href="#notification" id="notification" style="color: inherit; text-decoration: none;">
+					<h4>Notification</h4>
+				</a>
+				<p>A Notification is a Request object without an &quot;id&quot; member. A Request  object that is a Notification signifies the Client&#39;s lack of interest in the corresponding Response object, and as such no Response object needs to be returned to the client. The Server MUST NOT reply to a  Notification, including those that are within a batch request.</p>
+				<a href="#response" id="response" style="color: inherit; text-decoration: none;">
+					<h4>Response</h4>
+				</a>
+				<p>When a rpc call is made, the Server MUST reply with a Response, except  for in the case of Notifications. The Response is expressed as a single  JSON Object, there two different kind of responses, both includes the <em>id</em> member that MUST be the same provided in the request:</p>
+				<ul>
+					<li><strong>Success</strong>, this response is returned if the client-provided request succeed, this object includes a field called <em>result</em>, that contains the specific result provided by the method invocation.</li>
+					<li><strong>Error</strong>, this response, instead, is returned if the client-provided request failed. This object has another member called <em>error</em>, which is represented by a structure with three members: <em>code</em>, <em>message</em> and <em>data</em> which provide information about the error that has occurred.</li>
+				</ul>
+				<p>For more information about the protocol please take a look at <a href="https://www.jsonrpc.org/specification">JSON-RPC2 specification</a> page.</p>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h2>Installation</h2>
+				</a>
+				<p>You can easily install the package from the nodejs package manage (npm)</p>
+				<pre><code class="language-bash">npm install jsonrpc-lib</code></pre>
+				<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
+					<h2>Getting Started</h2>
+				</a>
+				<p>Once you have installed the package either globally or locally, you just have to import the package whenever you require it, like as follow.</p>
+				<p>Using <em>javascript</em>:</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> jsonrpc = <span class="hljs-built_in">require</span>(<span class="hljs-string">'jsonrpc-lib'</span>)</code></pre>
+				<p>Using <em>typescript</em>:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> jsonrpc <span class="hljs-keyword">from</span> <span class="hljs-string">'jsonrpc-lib'</span></code></pre>
+				<p>This package provides some help functions that allow developers to easily generate instances of JSON-RPC2 messages, a complete mapping among JSON-RPC2 messages and jsonrpc-lib classes is explained in <strong>Table 1</strong>.</p>
+				<pre><code class="language-typescript">jsonrpc.generateRequest(...)         <span class="hljs-comment">// generate a JsonRpcRequest object</span>
+jsonrpc.generateNotification(...)     <span class="hljs-comment">// generate a JsonRpcNotification object</span>
+jsonrpc.generateSuccess(...)        <span class="hljs-comment">// generate a JsonRpcSuccess response</span>
+jsonrpc.generateError(...)            <span class="hljs-comment">// generate a JsonRpcError response</span></code></pre>
+				<br/>
+				<img src="message-class-mapping.png" width="600px">
+				<p><strong>Table 1</strong> provide a mapping between the JSON-RPC2 messages and the equivalent jsonrpc-lib classes</p>
+				<a href="#parsing" id="parsing" style="color: inherit; text-decoration: none;">
+					<h3>Parsing</h3>
+				</a>
+				<p>Moreover this package provides a way to parse string payload messages (e.g., received from http request) into JSON-RPC2 objects (i.e., jsonrpc-lib classes) using a function called <em>parse</em>. This function parse the string data checking if it is a valid JSON-RPC2 message, if so it generate the equivalent class instance, otherwise it throws an error object which contains information about what went wrong during parsing. This object is a valid error object that can be put inside the JsonRpcError response and then sent to the client. The <em>parse</em> function can be easily used as follow:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> rpcMessage = jsonrpc.parse(msg);</code></pre>
+				<p>where <code>rpcMessage</code> will contain the class instance of the specific parsed msg, if valid, otherwise an ErrorObject will be thrown, hence the function should be properly surrounded by the <em>try-catch</em> statement.</p>
+				<p>In order to avoid the function to throws an Error, the <code>msg</code> data should be a valid JSON-RPC2 payload or an array of them. </p>
+				<a href="#examples" id="examples" style="color: inherit; text-decoration: none;">
+					<h2>Examples</h2>
+				</a>
+				<a href="#parse" id="parse" style="color: inherit; text-decoration: none;">
+					<h3>Parse</h3>
+				</a>
+				<p><strong>Success</strong></p>
+				<p>This example shows a succeed invocation of the <em>parse</em> function, that will generate the equivalent JsonRpc class of the <code>msg</code> parsed.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> msg = <span class="hljs-string">'{"jsonrpc":"2.0", "id":"abcdefg", "method":"send", "params": {"from": "my-addr", "to":"your-addr", "amount":50}}'</span>;
+
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> rpcMessage = jsonrpc.parse(msg);  <span class="hljs-comment">// execution succeed</span>
+    <span class="hljs-comment">// rpcMessage is an instance of JsonRpcRequest</span>
+    <span class="hljs-comment">//{</span>
+    <span class="hljs-comment">//    jsonrpc: "2.0",</span>
+    <span class="hljs-comment">//    id: "abcdefg",</span>
+    <span class="hljs-comment">//    method: "send",</span>
+    <span class="hljs-comment">//    params: {</span>
+    <span class="hljs-comment">//        "from": "my-addr",</span>
+    <span class="hljs-comment">//        "to": "your-addr",</span>
+    <span class="hljs-comment">//        "amount": 50</span>
+    <span class="hljs-comment">//    }</span>
+    <span class="hljs-comment">//}</span>
+} <span class="hljs-keyword">catch</span>(err) {
+    <span class="hljs-built_in">console</span>.log(err)  <span class="hljs-comment">// this won't be executed</span>
+}</code></pre>
+				<p><strong>Fail</strong></p>
+				<p>This, instead, provide ad example of failed invocation. In this case the failure is due to the fact that the client is trying to used an unsupported jsonrpc version.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> msg = <span class="hljs-string">'{"jsonrpc":"1.0", "id":"abcdefg", "method":"send", "params": {"from": "my-addr", "to":"your-addr", "amount":50}}'</span>;
+
+<span class="hljs-keyword">try</span> {
+    <span class="hljs-comment">// execution will fail since the jsonrpc 1.0 version is not supported</span>
+    <span class="hljs-keyword">const</span> rpcMessage = jsonrpc.parse(msg); 
+} <span class="hljs-keyword">catch</span>(err) {
+    <span class="hljs-built_in">console</span>.log(err)  <span class="hljs-comment">// this error is an ErrorObject instace</span>
+    <span class="hljs-comment">//{</span>
+    <span class="hljs-comment">//    code: -32600</span>
+    <span class="hljs-comment">//    message: "Invalid request"</span>
+    <span class="hljs-comment">//    data: "Version 1.0 not supported! Please use 2.0 instead."</span>
+    <span class="hljs-comment">//}</span>
+}</code></pre>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
