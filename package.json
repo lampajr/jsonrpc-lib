@@ -13,7 +13,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "coverage": "jest --coverage",
-    "doc": "typedoc --out docs src/jsonrpc.ts"
+    "docs": "typedoc --out docs src/jsonrpc.ts"
   },
   "repository": {
     "type": "git",
