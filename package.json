@@ -1,5 +1,5 @@
 {
-  "name": "jsonrpc-lib",
+  "name": "@lampajr/jsonrpc-lib",
   "version": "0.1.0",
   "description": "JSON-RPC 2.0 parser and serializer nodejs module",
   "main": "dist/jsonrpc.ts",
