@@ -1,4 +1,5 @@
 # JSON-RPC 2.0 library
+
 jsonrpc-lib is a nodejs package for parsing and serialising JSON-RPC2 messages.
 
 Inspired by [jsonrpc-lite](https://github.com/teambition/jsonrpc-lite/blob/master/README.md).
