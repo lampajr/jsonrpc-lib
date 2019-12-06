@@ -60,13 +60,13 @@ Once you have installed the package either globally or locally, you just have to
 Using *javascript*:
 
 ```javascript
-const jsonrpc = require('jsonrpc-lib')
+const jsonrpc = require('@lampajr/jsonrpc-lib')
 ```
 
 Using *typescript*:
 
 ```typescript
-import jsonrpc from 'jsonrpc-lib'
+import jsonrpc from '@lampajr/jsonrpc-lib'
 ```
 
 This package provides some help functions that allow developers to easily generate instances of JSON-RPC2 messages, a complete mapping among JSON-RPC2 messages and jsonrpc-lib classes is explained in **Table 1**.
