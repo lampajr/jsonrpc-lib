@@ -50,7 +50,7 @@ For more information about the protocol please take a look at [JSON-RPC2 specifi
 You can easily install the package from the nodejs package manage (npm)
 
 ```bash
-npm install jsonrpc-lib
+npm install @lampajr/jsonrpc-lib
 ```
 
 ## Getting Started
