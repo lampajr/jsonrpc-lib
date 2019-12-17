@@ -1,8 +1,8 @@
 {
   "name": "@lampajr/jsonrpc-lib",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "JSON-RPC 2.0 parser and serializer nodejs module",
-  "main": "dist/jsonrpc.ts",
+  "main": "dist/jsonrpc.js",
   "types": "dist/jsonrpc.d.ts",
   "engines": {
     "node": ">= 10.16.3"
