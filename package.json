@@ -1,6 +1,6 @@
 {
   "name": "@lampajr/jsonrpc-lib",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "JSON-RPC 2.0 parser and serializer nodejs module",
   "main": "dist/jsonrpc.js",
   "types": "dist/jsonrpc.d.ts",
@@ -25,11 +25,13 @@
   "keywords": [
     "JSON",
     "JSON-RPC",
+    "jsonrpc",
+    "json-rpc",
     "jsonrpc2",
     "parser",
     "serializer"
   ],
-  "author": "Andrea Lamparelli",
+  "author": "Andrea Lamparelli <lampa9559@gmail.com>",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/lampajr/jsonrpc-lib/issues"

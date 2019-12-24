@@ -321,11 +321,16 @@ export type JsonRpcMessage = JsonRpcRequest | JsonRpcNotification | JsonRpcSucce
  * @returns the specific JSON-RPC message object
  */
 export function parse(data: any): JsonRpcMessage | JsonRpcMessage[] {
-  if (data == null || !isString(data)) {
-    throw ErrorObject.invalidRequest('Message MUST be not null and in string format!');
+  if (data == null) {
+    throw ErrorObject.invalidRequest('Message MUST be not null!');
+  }
+
+  if (!isString(data) && !isObject(data)) {
+    throw ErrorObject.invalidRequest('Message MUST be not a string or an object!');
   }
 
   try {
+    data = isObject(data) ? JSON.stringify(data) : data;
     const obj: JsonRpc | JsonRpc[] = JSON.parse(data);
     if (isObject(obj)) {
       return parseJsonRpcMessage(obj as JsonRpc);
