@@ -1,4 +1,5 @@
 # JSON-RPC 2.0 library
+
 ![node](https://img.shields.io/node/v/@lampajr/jsonrpc-lib?style=plastic)
 ![license](https://img.shields.io/github/license/lampajr/jsonrpc-lib?style=plastic)
 ![last commit](https://img.shields.io/github/last-commit/lampajr/jsonrpc-lib?style=plastic)
@@ -12,7 +13,7 @@ Inspired by [jsonrpc-lite](https://github.com/teambition/jsonrpc-lite/blob/maste
 
 **Version**: 1.0.0
 
-**Date**: December 3, 2019
+**Date**: December 24, 2019
 
 **Author**: Andrea Lamparelli
 
@@ -67,7 +68,7 @@ import jsonrpc from '@lampajr/jsonrpc-lib';
 
 This package provides some help functions that allow developers to easily generate instances of JSON-RPC2 messages, a complete mapping among JSON-RPC2 messages and jsonrpc-lib classes is explained in **Table 1**.
 
-| __JSON-RPC 2.0 Message__ | __jsonrpc-lib Class__ |
+| **JSON-RPC 2.0 Message** | **jsonrpc-lib Class** |
 | :----------------------: | :-------------------: |
 |         Request          |   `JsonRpcRequest`    |
 |       Notification       | `JsonRpcNotification` |
