@@ -199,12 +199,12 @@ describe('jsonrpc module tests', () => {
 
         describe('test JsonRpcNotification', () => {
           test('valid notification message', () => {
-            const obj = '{"jsonrpc":"2.0","method":"invoke","params":{"param1":3,"param2":[3,4,5]}}';
+            const obj = {jsonrpc: "2.0", method: "invoke", params: {param1: 3, param2: [3, 4, 5]}};
             expect(() => {
               parse(obj);
             }).not.toThrow(ErrorObject);
             expect(parse(obj)).toBeInstanceOf(JsonRpcNotification);
-            expect((parse(obj) as JsonRpcNotification).serialize()).toEqual(obj);
+            expect((parse(obj) as JsonRpcNotification).serialize()).toEqual(JSON.stringify(obj));
           });
         });
       });
